@@ -1,0 +1,63 @@
+{
+    "name": "query-modules-version",
+    "displayName": "query-modules-version",
+    "description": "query modules version",
+    "version": "0.0.2",
+    "publisher": "luren",
+    "engines": {
+        "vscode": "^1.12.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onLanguage:javascript",
+        "onCommand:extension.queryModulesVersion"
+    ],
+    "main": "./extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "extension.queryModulesVersion",
+                "title": "查看依赖的安装版本"
+            }
+        ],
+        "menus": {
+            "explorer/context": [
+                {
+                    "when": "explorerResourceIsFolder",
+                    "command": "extension.queryModulesVersion",
+                    "group": "c_cxtmenu@1"
+                },
+                {
+                    "when": "resourceFilename == package.json",
+                    "command": "extension.queryModulesVersion",
+                    "group": "c_cxtmenu@2"
+                }
+            ]
+        }
+    },
+    "capabilities": {
+        "completionProvider": {
+            "resolveProvider": "true",
+            "triggerCharacters": [
+                "import "
+            ]
+        }
+    },
+    "scripts": {
+        "postinstall": "node ./node_modules/vscode/bin/install"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/kscript/query-modules-version.git"
+    },
+    "devDependencies": {
+        "typescript": "^2.0.3",
+        "vscode": "^1.0.0",
+        "mocha": "^2.3.3",
+        "eslint": "^3.6.0",
+        "@types/node": "^6.0.40",
+        "@types/mocha": "^2.2.32"
+    }
+}
