@@ -13,13 +13,13 @@
     "activationEvents": [
         "onLanguage:javascript",
         "onCommand:extension.queryModulesVersion",
-        "onCommand:extension.cnpminstall"
+        "onCommand:extension.cnpmInstall"
     ],
     "main": "./extension",
     "contributes": {
         "commands": [
             {
-                "command": "extension.cnpminstall",
+                "command": "extension.cnpmInstall",
                 "title": "安装依赖(cnpm)"
             },
             {
@@ -35,14 +35,19 @@
                     "group": "c_cxtmenu@1"
                 },
                 {
-                    "when": "resourceFilename == package.json",
+                    "when": "resourceFilename == 'package.json'",
                     "command": "extension.queryModulesVersion",
+                    "group": "c_cxtmenu@1"
+                },
+                {
+                    "when": "explorerResourceIsFolder",
+                    "command": "extension.cnpmInstall",
                     "group": "c_cxtmenu@2"
                 },
                 {
-                    "when": "resourceFilename == package.json",
-                    "command": "extension.cnpminstall",
-                    "group": "c_cxtmenu@3"
+                    "when": "resourceFilename == 'package.json'",
+                    "command": "extension.cnpmInstall",
+                    "group": "c_cxtmenu@2"
                 }
             ]
         }
@@ -57,6 +62,7 @@
         }
     },
     "scripts": {
+        "package": "vsce package",
         "postinstall": "node ./node_modules/vscode/bin/install"
     },
     "repository": {

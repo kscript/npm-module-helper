@@ -4,6 +4,7 @@ const outputChannel = Window.createOutputChannel('cmd');
 const terminal = Window.createTerminal('cmd');
 
 module.exports = {
+  Window,
   outputChannel,
   terminal
 }
