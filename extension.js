@@ -5,6 +5,7 @@ var exec = require('child_process').exec;
 
 var fs = require('fs');
 var path = require('path');
+var output = require('./output');
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 
@@ -21,9 +22,9 @@ function activate(context) {
             }
         });
     });
-    // var disposable = vscode.commands.registerCommand('extension.cnpminstall', function (context) {
-    //     cnpminstall(context);
-    // });
+    var disposable = vscode.commands.registerCommand('extension.cnpminstall', function (context) {
+        cnpminstall(context);
+    });
 
     context.subscriptions.push(disposable);
 }
@@ -36,22 +37,14 @@ exports.deactivate = deactivate;
 
 function cnpminstall(context){
     var fsPath = app.fsPath = path.dirname(context.fsPath);
-    readFile(path.join(fsPath, 'package.json'), (err, data) => {
-        if (err) {
-            vscode.window.showErrorMessage("未找到package.json");
-        } else {
-            console.log(exec)
-            exec('cnpm install', function(error, stdout, stderr){
-                if(error) {
-                    console.error('error: ' + error);
-                    return;
-                }
-                console.log('stdout: ' + stdout);
-                console.log('stderr: ' + stderr);
-            });
-            // var package = JSON.parse(data);
-        }
-    })
+    // output.outputChannel.show();
+    // output.outputChannel.appendLine("cnpm install");
+    try{
+        output.terminal.show();
+        output.terminal.sendText("cnpm i");
+    } catch(e){
+        output.outputChannel.appendLine(e);
+    }
 }
 function queryVersion(context, dir){
     app.context = context;

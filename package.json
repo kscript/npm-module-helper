@@ -12,11 +12,16 @@
     ],
     "activationEvents": [
         "onLanguage:javascript",
-        "onCommand:extension.queryModulesVersion"
+        "onCommand:extension.queryModulesVersion",
+        "onCommand:extension.cnpminstall"
     ],
     "main": "./extension",
     "contributes": {
         "commands": [
+            {
+                "command": "extension.cnpminstall",
+                "title": "安装依赖(cnpm)"
+            },
             {
                 "command": "extension.queryModulesVersion",
                 "title": "查看依赖的安装版本"
@@ -33,6 +38,11 @@
                     "when": "resourceFilename == package.json",
                     "command": "extension.queryModulesVersion",
                     "group": "c_cxtmenu@2"
+                },
+                {
+                    "when": "resourceFilename == package.json",
+                    "command": "extension.cnpminstall",
+                    "group": "c_cxtmenu@3"
                 }
             ]
         }
@@ -40,6 +50,7 @@
     "capabilities": {
         "completionProvider": {
             "resolveProvider": "true",
+            "externalConsole": "true",
             "triggerCharacters": [
                 "import "
             ]
