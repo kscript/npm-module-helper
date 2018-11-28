@@ -107,7 +107,7 @@ function moduleInstall(context, type){
             try{
                 var terminal = Terminal('cmd', output.Window);
                 terminal.show();
-                if(context.fsPath !== context.fsDir){
+                if(path.dirname(context.fsPath) !== context.fsDir){
                     terminal.sendText("cd " + context.fsDir);
                 }
                 hasModule[0] && terminal.sendText("cnpm " + type + " " + selected + ' -S');
@@ -115,6 +115,8 @@ function moduleInstall(context, type){
             }catch(e){
                 console.log(e)
             }
+        } else {
+            vscode.window.showErrorMessage("选择模块无效!");
         }
     })
 }
@@ -123,7 +125,6 @@ function moduleRebuild(context, type){
 }
 function moduleUninstall(context, type){
     var selected = extractText(output.Window);
-    console.log(selected)
     selected && fsStat(path.join(context.fsDir, 'node_modules', selected), function(error, stat){
         if(error){
             vscode.window.showInformationMessage("未找到 " + selected + " 模块, 卸载结束!");
