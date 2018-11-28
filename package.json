@@ -2,7 +2,7 @@
     "name": "npm-module-helper",
     "displayName": "npm-module-helper",
     "description": "npm模块助手",
-    "version": "0.0.4",
+    "version": "0.0.6",
     "publisher": "luren",
     "engines": {
         "vscode": "^1.12.0"
