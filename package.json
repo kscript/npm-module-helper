@@ -89,10 +89,10 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/kscript/query-modules-version.git"
+        "url": "https://github.com/kscript/npm-module-helper.git"
     },
     "bugs": {
-        "url": "https://github.com/kscript/query-modules-version/issues"
+        "url": "https://github.com/kscript/npm-module-helper/issues"
     },
     "keywords": [
         "npm",
