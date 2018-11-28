@@ -1,8 +1,8 @@
 {
-    "name": "query-modules-version",
-    "displayName": "query-modules-version",
-    "description": "query modules version",
-    "version": "0.0.3",
+    "name": "npm-module-helper",
+    "displayName": "npm-module-helper",
+    "description": "npm模块助手",
+    "version": "0.0.4",
     "publisher": "luren",
     "engines": {
         "vscode": "^1.12.0"
@@ -13,9 +13,11 @@
     "activationEvents": [
         "onLanguage:javascript",
         "onCommand:extension.queryModulesVersion",
-        "onCommand:extension.cnpmInstall"
+        "onCommand:extension.cnpmInstall",
+        "onCommand:extension.moduleInstall",
+        "onCommand:extension.moduleUninstall"
     ],
-    "main": "./extension",
+    "main": "src/extension",
     "contributes": {
         "commands": [
             {
@@ -25,6 +27,14 @@
             {
                 "command": "extension.queryModulesVersion",
                 "title": "查看依赖的安装版本"
+            },
+            {
+                "command": "extension.moduleInstall",
+                "title": "安装模块"
+            },
+            {
+                "command": "extension.moduleUninstall",
+                "title": "卸载模块"
             }
         ],
         "menus": {
@@ -49,6 +59,18 @@
                     "command": "extension.cnpmInstall",
                     "group": "c_cxtmenu@2"
                 }
+            ],
+            "editor/context": [
+                {
+                    "when": "editorTextFocus && resourceFilename == 'package.json'",
+                    "command": "extension.moduleInstall",
+                    "group": "c_cxtmenu@3"
+                },
+                {
+                    "when": "editorTextFocus && resourceFilename == 'package.json'",
+                    "command": "extension.moduleUninstall",
+                    "group": "c_cxtmenu@4"
+                }
             ]
         }
     },
@@ -70,12 +92,14 @@
         "url": "https://github.com/kscript/query-modules-version.git"
     },
     "bugs": {
-		"url": "https://github.com/kscript/query-modules-version/issues"
+        "url": "https://github.com/kscript/query-modules-version/issues"
     },
     "keywords": [
+        "npm",
+        "install",
         "version",
-        "install"
-	],
+        "tool"
+    ],
     "devDependencies": {
         "typescript": "^2.0.3",
         "vscode": "^1.0.0",

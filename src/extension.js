@@ -18,7 +18,22 @@ function activate(context) {
             queryPackageVersion(context);
         });
     });
-    var disposable = vscode.commands.registerCommand('extension.cnpmInstall', function (context) {
+    disposable = vscode.commands.registerCommand('extension.moduleInstall', function (context) {
+        formatDir(context, function(err, context){
+            moduleInstall(context, 'install');
+        });
+    });
+    disposable = vscode.commands.registerCommand('extension.moduleUninstall', function (context) {
+        formatDir(context, function(err, context){
+            moduleUninstall(context, 'uninstall');
+        });
+    });
+    // disposable = vscode.commands.registerCommand('extension.moduleRebuild', function (context) {
+    //     formatDir(context, function(err, context){
+    //         moduleRebuild(context, 'rebuild');
+    //     });
+    // });
+    disposable = vscode.commands.registerCommand('extension.cnpmInstall', function (context) {
         formatDir(context, function(err, context){
             cnpmInstall(context);
         });
@@ -43,7 +58,6 @@ function cnpmInstall(context){
             if (err) {
                 vscode.window.showErrorMessage("未找到 package.json 文件");
             } else {
-                // console.log(output.terminal, output.Window);
                 output.terminal.show();
                 output.terminal.sendText("cnpm i");
             }
@@ -77,6 +91,104 @@ function queryPackageVersion(context){
     });
 }
 
+function moduleInstall(context, type){
+    var selected = extractText(output.Window);
+    selected && readFile(context.fsPath, function(err, data){
+        if(err){
+            return;
+        }
+        var packageJSON;
+        try{
+            packageJSON = JSON.parse(data);
+        }catch(e){
+        }
+        var hasModule = [packageJSON.dependencies[selected], packageJSON.devDependencies[selected]]
+        if(hasModule[0] || hasModule[1]){
+            try{
+                var terminal = Terminal('cmd', output.Window);
+                terminal.show();
+                if(context.fsPath !== context.fsDir){
+                    terminal.sendText("cd " + context.fsDir);
+                }
+                hasModule[0] && terminal.sendText("cnpm " + type + " " + selected + ' -S');
+                hasModule[1] && terminal.sendText("cnpm " + type + " " + selected + ' -D');
+            }catch(e){
+                console.log(e)
+            }
+        }
+    })
+}
+function moduleRebuild(context, type){
+
+}
+function moduleUninstall(context, type){
+    var selected = extractText(output.Window);
+    console.log(selected)
+    selected && fsStat(path.join(context.fsDir, 'node_modules', selected), function(error, stat){
+        if(error){
+            vscode.window.showInformationMessage("未找到 " + selected + " 模块, 卸载结束!");
+        } else {
+            readFile(context.fsPath, function(err, data){
+                if(err){
+                    return;
+                }
+                var packageJSON;
+                try{
+                    packageJSON = JSON.parse(data);
+                }catch(e){
+                }
+                var hasModule = [packageJSON.dependencies[selected], packageJSON.devDependencies[selected]]
+                if(hasModule[0] || hasModule[1]){
+                    try{
+                        var terminal = Terminal('cmd', output.Window);
+                        terminal.show();
+                        if(context.fsPath !== context.fsDir){
+                            terminal.sendText("cd " + context.fsDir);
+                        }
+                        hasModule[0] && terminal.sendText("npm " + type + " " + selected + ' -S');
+                        hasModule[1] && terminal.sendText("npm " + type + " " + selected + ' -D');
+                    }catch(e){
+                        console.log(e)
+                    }
+                }
+            })
+        }
+    });
+}
+
+function extractText(Window){
+    var editor = Window.activeTextEditor;
+    var selection = editor.selection;
+    if(!editor)return ;
+    // 如果用户选择了多行, 则直接提示 
+    if(selection.start.line != selection.end.line){
+        vscode.window.showErrorMessage("模块无效, 不能执行卸载命令");
+        return ;
+    }
+    var line = editor._documentData._lines[selection.start.line];
+    var text = editor.document.getText(selection);
+    var modules = line.match(/"(.*?)"/g);
+    var selected = '';
+    
+    if(!modules){
+        vscode.window.showErrorMessage("模块无效, 不能执行卸载命令");
+        return ;
+    } else if(modules && modules.length < 3){
+        selected = modules[0].slice(1,-1);
+    } else {
+        var right = line.slice(selection.start.character);
+        if(right.indexOf('"')<0){
+            vscode.window.showErrorMessage("模块无效, 不能执行卸载命令");
+        }else {
+            selected = right.slice(0, right.indexOf('"'));
+        }
+    }
+    return selected;
+}
+
+function Terminal(name, Window){
+    return Window.createTerminal(name || 'cmd');
+}
 
 /**
  * 读取package.json信息
