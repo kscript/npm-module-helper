@@ -21,7 +21,6 @@
 | 版本 | 说明 |
 --|--
 | 0.1.0 | cnpm 换为 npm 
-| 0.0.9 | 考虑到查看 项目依赖的安装版本 时可能需要文件对比, 添加了一个diff插件(Diff Tool), 如不需要, 可在插件管理中禁用
 
 ### 参考插件
 [create-react-component](https://github.com/tobi12345/create-react-component)

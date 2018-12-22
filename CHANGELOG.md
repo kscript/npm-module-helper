@@ -1,3 +1,7 @@
+## 0.1.1
+移除diff插件: diff-tool
+(由于设置为 extensionDependencies的插件, 不能单独禁用, 有需要的自行安装吧)
+
 ## 0.1.0
 1. 调整部分逻辑
 2. cnpm 换为 npm
