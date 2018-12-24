@@ -34,7 +34,6 @@ var hasMember = function (list, key, val) {
 var Terminal = function (window, name) {
   return window.createTerminal(name || 'cmd');
 }
-
 var cdProjectPath = function (terminal, context) {
   // TODO 后期需对项目目录进行判断
   var isProjectPath = false;
@@ -51,42 +50,50 @@ module.exports = {
   npmInstall: function (context) {
     var that = this;
     var terminal = that.terminal();
-    try {
-      files.readFile(path.join(context.fsDir, 'package.json'), function (err, data) {
+    files.currentPath(context, function (err, context) {
+      if (err) {
+        window.showErrorMessage("选择无效");
+        return;
+      }
+      try {
+        files.readFile(path.join(context.fsDir, 'package.json'), function (err, data) {
+          if (err) {
+            window.showErrorMessage("未找到 package.json 文件");
+          } else {
+            cdProjectPath(terminal, context);
+            terminal.show();
+            terminal.sendText("npm i");
+          }
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    });
+  },
+  queryPackageVersion: function (context) {
+    files.currentPath(context, function (err, context) {
+      var fsDir = context.fsDir;
+      files.readFile(path.join(fsDir, 'package.json'), function (err, data) {
         if (err) {
           window.showErrorMessage("未找到 package.json 文件");
         } else {
-          cdProjectPath(terminal, context);
-          terminal.show();
-          terminal.sendText("npm i");
-        }
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  },
-  queryPackageVersion: function (context) {
-    var fsDir = context.fsPath;
-    files.readFile(path.join(fsDir, 'package.json'), function (err, data) {
-      if (err) {
-        window.showErrorMessage("未找到 package.json 文件");
-      } else {
-        var package = JSON.parse(data);
-        var out = package;
-        files.fsStat(path.join(fsDir, 'node_modules'), function (error, stat) {
-          if (error) {
-            window.showErrorMessage("未找到 node_modules 目录");
-          } else {
-            package.dependencies && (out.dependencies = Util.queryModuleVersion(package.dependencies, fsDir));
-            package.devDependencies && (out.devDependencies = Util.queryModuleVersion(package.devDependencies, fsDir));
-            if (Util.isEmpty(out.dependencies) && Util.isEmpty(out.devDependencies)) {
-              window.showInformationMessage("查询依赖版本完毕! 依赖为空!");
+          var package = JSON.parse(data);
+          var out = package;
+          files.fsStat(path.join(fsDir, 'node_modules'), function (error, stat) {
+            if (error) {
+              window.showErrorMessage("未找到 node_modules 目录");
             } else {
-              Util.outPackage(fsDir, window, out);
+              package.dependencies && (out.dependencies = Util.queryModuleVersion(package.dependencies, fsDir));
+              package.devDependencies && (out.devDependencies = Util.queryModuleVersion(package.devDependencies, fsDir));
+              if (Util.isEmpty(out.dependencies) && Util.isEmpty(out.devDependencies)) {
+                window.showInformationMessage("查询依赖版本完毕! 依赖为空!");
+              } else {
+                Util.outPackage(fsDir, window, out);
+              }
             }
-          }
-        })
-      };
+          })
+        };
+      });
     });
   },
   moduleHandlerByType: function (context, type, func) {
@@ -149,7 +156,6 @@ module.exports = {
       }
     });
   },
-
   registerCommand: function (command, func) {
     return disposables = disposables.concat(
       vscode.commands.registerCommand(command, function (context) {

@@ -33,16 +33,25 @@ const files = {
   fsStat: function (_path, func, success, error) {
     fs.stat(_path, func);
   },
+  fsStatsync: function (_path, func, success, error) {
+    return fs.statSync(_path, func);
+  },
   currentPath: function (context, func) {
-    if (context.scheme == 'file') {
+    let stats = this.fsStatsync(context.fsPath);
+    if (stats.isFile()) {
       context.isDir = false;
       context.fsDir = path.dirname(context.fsPath);
-      func(null, context);
-    } else {
+      func && func(null, context);
+    } else if (stats.isDirectory()) {
       context.isDir = true;
       context.fsDir = context.fsPath;
-      func(null, context);
+      func && func(null, context);
+    } else {
+      context.isDir = false;
+      context.fsDir = context.fsPath;
+      func && func('typeError', context);
     }
+    return context
   }
 }
 module.exports = files

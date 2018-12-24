@@ -2,7 +2,7 @@
     "name": "npm-module-helper",
     "displayName": "npm-module-helper",
     "description": "npm模块助手",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "publisher": "luren",
     "engines": {
         "vscode": "^1.12.0"
@@ -107,9 +107,6 @@
         "package": "vsce package",
         "postinstall": "node ./node_modules/vscode/bin/install"
     },
-    "extensionDependencies":[
-        "jinsihou.diff-tool"
-    ],
     "repository": {
         "type": "git",
         "url": "https://github.com/kscript/npm-module-helper.git"
