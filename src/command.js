@@ -21,16 +21,7 @@ var formatPackage = function (data) {
   }
   return packageJSON
 }
-var hasMember = function (list, key, val) {
-  var has = false;
-  if (!list || !(list instanceof Array) || !list.length) {
-    return false;
-  }
-  for (var i = 0, len = list.length; i < len && !has; i++) {
-    has = list[key] === val;
-  }
-  return has;
-}
+
 var Terminal = function (window, name) {
   return window.createTerminal(name || 'cmd');
 }
@@ -192,7 +183,9 @@ module.exports = {
       try {
         var id = terminalInstance._id;
         var terminals = window.terminals || [];
-        var isRuning = hasMember(terminals, '_id', id);
+        var isRuning = terminals.filter(function(item){
+          return item._id === id;
+        }).length > 0;
         if (isRuning) {
           return terminalInstance;
         }
