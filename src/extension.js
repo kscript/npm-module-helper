@@ -4,27 +4,33 @@ var command = require('./command');
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 
+function proxy(){
+  if (command && command.proxy) {
+    return command.proxy();
+  }
+  return command;
+}
 // 插件入口, 用于注册命令
 
 function activate(context) {
   var disposables = command.registerCommands({
-    'extension.queryModulesVersion': function (context) {
-      command.queryPackageVersion(context);
+    'moduleHelper.queryModulesVersion': function (context) {
+      proxy().queryPackageVersion(context);
     },
-    'extension.moduleUninstall': function (context) {
-      command.moduleUninstall(context, 'uninstall');
+    'moduleHelper.moduleUninstall': function (context) {
+      proxy().moduleUninstall(context, 'uninstall');
     },
-    'extension.moduleInstall': function (context) {
-      command.moduleHandlerByType(context, 'install');
+    'moduleHelper.moduleInstall': function (context) {
+      proxy().moduleHandlerByType(context, 'install');
     },
-    'extension.moduleRebuild': function (context) {
-      command.moduleHandlerByType(context, 'rebuild');
+    'moduleHelper.moduleRebuild': function (context) {
+      proxy().moduleHandlerByType(context, 'rebuild');
     },
-    'extension.moduleUpdate': function (context) {
-      command.moduleHandlerByType(context, 'update');
+    'moduleHelper.moduleUpdate': function (context) {
+      proxy().moduleHandlerByType(context, 'update');
     },
-    'extension.npmInstall': function (context) {
-      command.npmInstall(context);
+    'moduleHelper.npmInstall': function (context) {
+      proxy().npmInstall(context);
     }
   });
   context.subscriptions = context.subscriptions.concat(disposables);

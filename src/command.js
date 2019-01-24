@@ -6,7 +6,6 @@ var window = vscode.window;
 
 var disposables = [];
 var terminalInstance = null;
-
 var formatPackage = function (data) {
   var packageJSON = {};
   try {
@@ -36,8 +35,53 @@ var cdProjectPath = function (terminal, context) {
     terminal.sendText("cd " + context.fsDir);
   }
 }
+var app = {
+  commands: {
+    yarn: {
+      install: 'add',
+      update: 'upgrade',
+      uninstall: 'remove'
+    },
+    npm: {
+      install: 'i'
+    },
+    cnpm: {
+      install: 'i'
+    }
+  },
+  configuration: {}
+};
+
+var handler = {
+  getCommand: function(command){
+    if(!command) return '';
+    var commands = app.commands[app.configuration.manager];
+    return commands ? commands[command] : command;
+  },
+  /**
+   * 
+   * @param {string} command 要执行的指令
+   * @param {string} $module 要安装的模块
+   * @param {string} mode 开发模式/生产模式
+   */
+  exec: function(command, $module, mode){
+    return [
+      app.configuration.manager,
+      this.getCommand(command),
+      $module || '',
+      $module ? mode || '' : ''
+    ].slice(0, arguments.length + 1).join(' ');
+  },
+}
 
 module.exports = {
+  updateConfiguration(){
+    return app.configuration = vscode.workspace.getConfiguration('moduleHelper');
+  },
+  proxy: function(){
+    this.updateConfiguration();
+    return this;
+  },
   npmInstall: function (context) {
     var that = this;
     var terminal = that.terminal();
@@ -53,7 +97,7 @@ module.exports = {
           } else {
             cdProjectPath(terminal, context);
             terminal.show();
-            terminal.sendText("npm i");
+            terminal.sendText(handler.exec('i'));
           }
         });
       } catch (e) {
@@ -88,13 +132,19 @@ module.exports = {
     });
   },
   moduleHandlerByType: function (context, type, func) {
+    var manager = app.configuration.manager;
+    if (manager == 'yarn' && type === 'rebuild') {
+      return ;
+    }
+    var len = manager === 'yarn' && type === 'update' ? 2 : 3;
     this.moduleHandler(context, function (hasModule, selected, terminal) {
       // 如果回调不存在, 或返回true
       if (!func || func(hasModule, selected, terminal)) {
-        hasModule[0] && terminal.sendText("npm " + type + " " + selected + ' -S');
-        hasModule[1] && terminal.sendText("npm " + type + " " + selected + ' -D');
+        hasModule[0] && terminal.sendText(handler.exec.apply(handler, [type, selected, '-S'].slice(0, len)));
+        hasModule[1] && terminal.sendText(handler.exec.apply(handler, [type, selected, '-D'].slice(0, len)));
       }
     })
+    
   },
   moduleHandler: function (context, func) {
     var that = this;
@@ -137,8 +187,10 @@ module.exports = {
             try {
               cdProjectPath(terminal, context);
               terminal.show();
-              hasModule[0] && terminal.sendText("npm " + type + " " + selected + ' -S');
-              hasModule[1] && terminal.sendText("npm " + type + " " + selected + ' -D');
+              // hasModule[0] && terminal.sendText("npm " + type + " " + selected + ' -S');
+              // hasModule[1] && terminal.sendText("npm " + type + " " + selected + ' -D');
+              hasModule[0] && terminal.sendText(handler.exec(type, selected, '-S'));
+              hasModule[1] && terminal.sendText(handler.exec(type, selected, '-D'));
             } catch (e) {
               console.log(e)
             }

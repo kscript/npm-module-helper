@@ -84,5 +84,14 @@ module.exports = {
       return false;
     }
     return true;
+  },
+  extends: function(source, target){
+    target = target || {};
+    for (var key in source) {
+      if (source.hasOwnProperty(key)) {
+        target = source[key];
+      }
+    }
+    return target;
   }
 }
