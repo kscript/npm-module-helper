@@ -2,7 +2,7 @@
     "name": "npm-module-helper",
     "displayName": "npm-module-helper",
     "description": "npm模块助手",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "publisher": "luren",
     "engines": {
         "vscode": "^1.12.0"
@@ -25,6 +25,11 @@
             "type": "object",
             "title": "npm-module-helper",
             "properties": {
+                "moduleHelper.terminalTitle": {
+                    "type": "string",
+                    "default": "npm module helper",
+                    "description": "显示标题"
+                },
                 "moduleHelper.manager": {
                     "type": "string",
                     "default": "npm",
