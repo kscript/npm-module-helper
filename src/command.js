@@ -38,7 +38,9 @@ var cdProjectPath = function (terminal, context) {
 var app = {
   commands: {
     yarn: {
+      i: '',
       install: 'add',
+      rebuild: 'add',
       update: 'upgrade',
       uninstall: 'remove'
     },
@@ -64,9 +66,11 @@ var handler = {
    * @param {string} mode 开发模式/生产模式
    */
   exec: function(command, $module, mode){
-    command = app.commands[app.configuration.manager][command] || command || ''
+    var manager = app.configuration.manager
+    var commands = app.commands[manager]
+    command = commands.hasOwnProperty(command) ? commands[command] : command
     return [
-      app.configuration.manager,
+      manager,
       command,
       $module || '',
       $module ? mode || '' : ''
@@ -134,9 +138,9 @@ module.exports = {
   },
   moduleHandlerByType: function (context, type, func) {
     var manager = app.configuration.manager
-    if (manager == 'yarn' && type === 'rebuild') {
-      return 
-    }
+    // if (manager == 'yarn' && type === 'rebuild') {
+    //   return 
+    // }
     var len = manager === 'yarn' && type === 'update' ? 2 : 3
     this.moduleHandler(context, function (hasModule, selected, terminal) {
       // 如果回调不存在, 或返回true
