@@ -9,7 +9,6 @@ function proxy(){
 
 // 插件入口, 用于注册命令
 function activate(context) {
-
   var disposables = command.registerCommands({
     'moduleHelper.queryModulesVersion': function (context) {
       proxy().queryPackageVersion(context)

@@ -118,9 +118,9 @@ module.exports = {
     var that = this
     var terminal = that.terminal()
     var ext = ((path.parse(context.path) || {}).ext || '').slice(1)
-    var selected;
+    var selected
     if (ext && new RegExp(app.configuration.ext).test(ext)){
-      selected = Util.extractModule(window);
+      selected = Util.extractModule(window)
       if (selected) {
         terminal.show()
         terminal.sendText(handler.exec.apply(handler, ['install', selected, '-D']))
@@ -210,8 +210,6 @@ module.exports = {
             try {
               cdProjectPath(terminal, context)
               terminal.show()
-              // hasModule[0] && terminal.sendText("npm " + type + " " + selected + ' -S')
-              // hasModule[1] && terminal.sendText("npm " + type + " " + selected + ' -D')
               hasModule[0] && terminal.sendText(handler.exec(type, selected, '-S'))
               hasModule[1] && terminal.sendText(handler.exec(type, selected, '-D'))
             } catch (e) {
