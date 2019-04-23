@@ -2,7 +2,7 @@
     "name": "npm-module-helper",
     "displayName": "npm-module-helper",
     "description": "npm模块助手",
-    "version": "0.1.8",
+    "version": "0.2.0",
     "publisher": "luren",
     "engines": {
         "vscode": "^1.12.0"
@@ -15,6 +15,7 @@
         "onCommand:moduleHelper.queryModulesVersion",
         "onCommand:moduleHelper.npmInstall",
         "onCommand:moduleHelper.moduleInstall",
+        "onCommand:moduleHelper.moduleInstall2",
         "onCommand:moduleHelper.moduleRebuild",
         "onCommand:moduleHelper.moduleUpdate",
         "onCommand:moduleHelper.moduleUninstall"
@@ -39,6 +40,11 @@
                         "cnpm"
                     ],
                     "description": "选择要使用的包管理器"
+                },
+                "moduleHelper.ext": {
+                    "type": "string",
+                    "default": "^js|jsx|ts|vue$",
+                    "description": "匹配文件类型"
                 }
             }
         },
@@ -53,6 +59,10 @@
             },
             {
                 "command": "moduleHelper.moduleInstall",
+                "title": "安装模块"
+            },
+            {
+                "command": "moduleHelper.moduleInstall2",
                 "title": "安装模块"
             },
             {
@@ -112,6 +122,11 @@
                     "when": "editorTextFocus && resourceFilename == 'package.json'",
                     "command": "moduleHelper.moduleUninstall",
                     "group": "c_cxtmenu@6"
+                },
+                {
+                    "when": "editorTextFocus && resourceFilename != 'package.json'",
+                    "command": "moduleHelper.moduleInstall2",
+                    "group": "c_cxtmenu@7"
                 }
             ]
         }

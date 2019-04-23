@@ -52,8 +52,12 @@ var app = {
     }
   },
   configuration: {},
+  types: {
+    install2: 'install'
+  },
   defaults: {
     mode: 'npm',
+    ext: '^js|jsx|ts|vue$',
     terminalTitle: 'npm module helper'
   }
 }
@@ -81,7 +85,7 @@ var handler = {
 module.exports = {
   updateConfiguration(){
     var configuration = vscode.workspace.getConfiguration('moduleHelper')
-    return app.configuration = Util.extend(app.defaults, configuration)
+    return app.configuration = Util.extend(configuration, Util.extend(app.defaults), true)
   },
   proxy: function(){
     this.updateConfiguration()
@@ -110,6 +114,23 @@ module.exports = {
       }
     })
   },
+  moduleInstall2: function(context){
+    var that = this
+    var terminal = that.terminal()
+    var ext = ((path.parse(context.path) || {}).ext || '').slice(1)
+    var selected;
+    if (ext && new RegExp(app.configuration.ext).test(ext)){
+      selected = Util.extractModule(window);
+      if (selected) {
+        terminal.show()
+        terminal.sendText(handler.exec.apply(handler, ['install', selected, '-D']))
+      } else {
+        window.showInformationMessage("当前行找不到有效的模块")
+      }
+    } else {
+      window.showInformationMessage("当前文件类型不匹配, 如需安装, 请先在设置中配置")
+    }
+  },
   queryPackageVersion: function (context) {
     files.currentPath(context, function (err, context) {
       var fsDir = context.fsDir
@@ -137,10 +158,8 @@ module.exports = {
     })
   },
   moduleHandlerByType: function (context, type, func) {
+    type = app.types[type] || type
     var manager = app.configuration.manager
-    // if (manager == 'yarn' && type === 'rebuild') {
-    //   return 
-    // }
     var len = manager === 'yarn' && type === 'update' ? 2 : 3
     this.moduleHandler(context, function (hasModule, selected, terminal) {
       // 如果回调不存在, 或返回true
@@ -149,7 +168,6 @@ module.exports = {
         hasModule[1] && terminal.sendText(handler.exec.apply(handler, [type, selected, '-D'].slice(0, len)))
       }
     })
-    
   },
   moduleHandler: function (context, func) {
     var that = this

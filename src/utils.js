@@ -22,33 +22,13 @@ module.exports = {
     var editor = window.activeTextEditor
     var selection = editor.selection
     try {
-      if (!editor) return
-      // 如果用户选择了多行, 则直接提示 
-      if (selection.start.line != selection.end.line) {
-        window.showErrorMessage("模块无效, 不能执行命令")
-        return
-      }
-      var line = editor._documentData._lines[selection.start.line]
-      var text = editor.document.getText(selection)
-      var modules = line.match(/"(.*?)"/g)
-      var selected = ''
-      var right = ''
-      if (!modules) {
-        window.showErrorMessage("模块无效, 不能执行命令")
-      } else if (modules && modules.length < 3) {
-        selected = modules[0].slice(1, -1)
-      } else {
-        var right = line.slice(selection.start.character)
-        if (right.indexOf('"') < 0) {
-          window.showErrorMessage("模块无效, 不能执行命令")
-        } else {
-          selected = right.slice(0, right.indexOf('"'))
-        }
+      // selection.start.line == selection.end.line
+      if (editor) {
+        return (editor._documentData._lines[selection.start.line]||'').match(/"(.*?)"|'(.*?)'/)[1]
       }
     } catch (e) {
       console.log(e)
     }
-    return selected
   },
   outPackage: function (fsDir, window, out) {
     files.fsStat(path.join(fsDir, 'package_out.json'), function (error, stat) {

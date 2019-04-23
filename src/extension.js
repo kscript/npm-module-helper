@@ -12,7 +12,6 @@ function activate(context) {
 
   var disposables = command.registerCommands({
     'moduleHelper.queryModulesVersion': function (context) {
-      console.log(context);
       proxy().queryPackageVersion(context)
     },
     'moduleHelper.moduleUninstall': function (context) {
@@ -20,6 +19,9 @@ function activate(context) {
     },
     'moduleHelper.moduleInstall': function (context) {
       proxy().moduleHandlerByType(context, 'install')
+    },
+    'moduleHelper.moduleInstall2': function (context) {
+      proxy().moduleInstall2(context)
     },
     'moduleHelper.moduleRebuild': function (context) {
       proxy().moduleHandlerByType(context, 'rebuild')
