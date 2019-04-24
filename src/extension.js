@@ -22,6 +22,9 @@ function activate(context) {
     'moduleHelper.moduleInstall2': function (context) {
       proxy().moduleInstall2(context)
     },
+    'moduleHelper.moduleUninstall2': function (context) {
+      proxy().moduleUninstall2(context)
+    },
     'moduleHelper.moduleRebuild': function (context) {
       proxy().moduleHandlerByType(context, 'rebuild')
     },

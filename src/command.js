@@ -114,7 +114,8 @@ module.exports = {
       }
     })
   },
-  moduleInstall2: function(context){
+  moduleHandlerByType2: function(context, info) {
+    info = info || {}
     var that = this
     var terminal = that.terminal()
     var ext = ((path.parse(context.path) || {}).ext || '').slice(1)
@@ -123,13 +124,27 @@ module.exports = {
       selected = Util.extractModule(window)
       if (selected) {
         terminal.show()
-        terminal.sendText(handler.exec.apply(handler, ['install', selected, '-D']))
+        terminal.sendText(handler.exec.apply(handler, [info.type, selected, '-D']))
       } else {
-        window.showInformationMessage("当前行找不到有效的模块")
+        info.select && window.showInformationMessage(info.select)
       }
     } else {
-      window.showInformationMessage("当前文件类型不匹配, 如需安装, 请先在设置中配置")
+      info.match && window.showInformationMessage(info.match)
     }
+  },
+  moduleInstall2: function(context){
+    this.moduleHandlerByType2(context, {
+      type: 'install',
+      match: '"当前文件类型不匹配, 如需安装, 请先在设置中配置"',
+      select: "当前行找不到有效的模块"
+    })
+  },
+  moduleUninstall2: function(context) {
+    this.moduleHandlerByType2(context, {
+      type: 'uninstall',
+      match: '"当前文件类型不匹配, 如需删除, 请先在设置中配置"',
+      select: "当前行找不到有效的模块"
+    })
   },
   queryPackageVersion: function (context) {
     files.currentPath(context, function (err, context) {

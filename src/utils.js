@@ -24,7 +24,7 @@ module.exports = {
     try {
       // selection.start.line == selection.end.line
       if (editor) {
-        var result = (editor._documentData._lines[selection.start.line]||'').match(/"(.*?)"|'(.*?)'/) || [];
+        var result = (editor._documentData._lines[selection.start.line]||'').match(/"(.*?)"|'(.*?)'/) || []
         return result[1] || result[2]
       }
     } catch (e) {

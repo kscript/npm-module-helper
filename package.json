@@ -2,7 +2,7 @@
     "name": "npm-module-helper",
     "displayName": "npm-module-helper",
     "description": "npm模块助手",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "publisher": "luren",
     "engines": {
         "vscode": "^1.12.0"
@@ -18,7 +18,8 @@
         "onCommand:moduleHelper.moduleInstall2",
         "onCommand:moduleHelper.moduleRebuild",
         "onCommand:moduleHelper.moduleUpdate",
-        "onCommand:moduleHelper.moduleUninstall"
+        "onCommand:moduleHelper.moduleUninstall",
+        "onCommand:moduleHelper.moduleUninstall2"
     ],
     "main": "src/extension",
     "contributes": {
@@ -77,6 +78,10 @@
             {
                 "command": "moduleHelper.moduleUninstall",
                 "title": "卸载模块"
+            },
+            {
+                "command": "moduleHelper.moduleUninstall2",
+                "title": "卸载模块"
             }
         ],
         "menus": {
@@ -127,6 +132,11 @@
                     "when": "editorTextFocus && resourceFilename != 'package.json'",
                     "command": "moduleHelper.moduleInstall2",
                     "group": "c_cxtmenu@7"
+                },
+                {
+                    "when": "editorTextFocus && resourceFilename != 'package.json'",
+                    "command": "moduleHelper.moduleUninstall2",
+                    "group": "c_cxtmenu@8"
                 }
             ]
         }
