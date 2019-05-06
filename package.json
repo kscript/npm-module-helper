@@ -1,179 +1,184 @@
 {
-    "name": "npm-module-helper",
-    "displayName": "npm-module-helper",
-    "description": "npm模块助手",
-    "version": "0.2.2",
-    "publisher": "luren",
-    "engines": {
-        "vscode": "^1.12.0"
-    },
-    "categories": [
-        "Other"
-    ],
-    "activationEvents": [
-        "onLanguage:javascript",
-        "onCommand:moduleHelper.queryModulesVersion",
-        "onCommand:moduleHelper.npmInstall",
-        "onCommand:moduleHelper.moduleInstall",
-        "onCommand:moduleHelper.moduleInstall2",
-        "onCommand:moduleHelper.moduleRebuild",
-        "onCommand:moduleHelper.moduleUpdate",
-        "onCommand:moduleHelper.moduleUninstall",
-        "onCommand:moduleHelper.moduleUninstall2"
-    ],
-    "main": "src/extension",
-    "contributes": {
-        "configuration": {
-            "type": "object",
-            "title": "npm-module-helper",
-            "properties": {
-                "moduleHelper.terminalTitle": {
-                    "type": "string",
-                    "default": "npm module helper",
-                    "description": "显示标题"
-                },
-                "moduleHelper.manager": {
-                    "type": "string",
-                    "default": "npm",
-                    "enum": [
-                        "npm",
-                        "yarn",
-                        "cnpm"
-                    ],
-                    "description": "选择要使用的包管理器"
-                },
-                "moduleHelper.ext": {
-                    "type": "string",
-                    "default": "^js|jsx|ts|vue$",
-                    "description": "匹配文件类型"
-                }
-            }
+  "name": "npm-module-helper",
+  "displayName": "npm-module-helper",
+  "description": "npm模块助手, 快速安装/卸载模块",
+  "version": "0.2.3",
+  "publisher": "luren",
+  "engines": {
+    "vscode": "^1.12.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:javascript",
+    "onCommand:moduleHelper.queryModulesVersion",
+    "onCommand:moduleHelper.npmInstall",
+    "onCommand:moduleHelper.moduleInstall",
+    "onCommand:moduleHelper.moduleInstall2",
+    "onCommand:moduleHelper.moduleRebuild",
+    "onCommand:moduleHelper.moduleUpdate",
+    "onCommand:moduleHelper.moduleUninstall",
+    "onCommand:moduleHelper.moduleUninstall2"
+  ],
+  "main": "dist/extension.js",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "npm-module-helper",
+      "properties": {
+        "moduleHelper.terminalTitle": {
+          "type": "string",
+          "default": "npm module helper",
+          "description": "显示标题"
         },
-        "commands": [
-            {
-                "command": "moduleHelper.npmInstall",
-                "title": "安装项目依赖"
-            },
-            {
-                "command": "moduleHelper.queryModulesVersion",
-                "title": "查看依赖的安装版本"
-            },
-            {
-                "command": "moduleHelper.moduleInstall",
-                "title": "安装模块"
-            },
-            {
-                "command": "moduleHelper.moduleInstall2",
-                "title": "安装模块"
-            },
-            {
-                "command": "moduleHelper.moduleUpdate",
-                "title": "更新模块"
-            },
-            {
-                "when": "moduleHelper.mode !== 'yarn'",
-                "command": "moduleHelper.moduleRebuild",
-                "title": "重装模块"
-            },
-            {
-                "command": "moduleHelper.moduleUninstall",
-                "title": "卸载模块"
-            },
-            {
-                "command": "moduleHelper.moduleUninstall2",
-                "title": "卸载模块"
-            }
-        ],
-        "menus": {
-            "explorer/context": [
-                {
-                    "when": "explorerResourceIsFolder",
-                    "command": "moduleHelper.queryModulesVersion",
-                    "group": "c_cxtmenu@1"
-                },
-                {
-                    "when": "resourceFilename == 'package.json'",
-                    "command": "moduleHelper.queryModulesVersion",
-                    "group": "c_cxtmenu@1"
-                },
-                {
-                    "when": "explorerResourceIsFolder",
-                    "command": "moduleHelper.npmInstall",
-                    "group": "c_cxtmenu@2"
-                },
-                {
-                    "when": "resourceFilename == 'package.json'",
-                    "command": "moduleHelper.npmInstall",
-                    "group": "c_cxtmenu@2"
-                }
-            ],
-            "editor/context": [
-                {
-                    "when": "editorTextFocus && resourceFilename == 'package.json'",
-                    "command": "moduleHelper.moduleInstall",
-                    "group": "c_cxtmenu@3"
-                },
-                {
-                    "when": "editorTextFocus && resourceFilename == 'package.json'",
-                    "command": "moduleHelper.moduleUpdate",
-                    "group": "c_cxtmenu@4"
-                },
-                {
-                    "when": "editorTextFocus && resourceFilename == 'package.json'",
-                    "command": "moduleHelper.moduleRebuild",
-                    "group": "c_cxtmenu@5"
-                },
-                {
-                    "when": "editorTextFocus && resourceFilename == 'package.json'",
-                    "command": "moduleHelper.moduleUninstall",
-                    "group": "c_cxtmenu@6"
-                },
-                {
-                    "when": "editorTextFocus && resourceFilename != 'package.json'",
-                    "command": "moduleHelper.moduleInstall2",
-                    "group": "c_cxtmenu@7"
-                },
-                {
-                    "when": "editorTextFocus && resourceFilename != 'package.json'",
-                    "command": "moduleHelper.moduleUninstall2",
-                    "group": "c_cxtmenu@8"
-                }
-            ]
+        "moduleHelper.manager": {
+          "type": "string",
+          "default": "npm",
+          "enum": [
+            "npm",
+            "yarn",
+            "cnpm"
+          ],
+          "description": "选择要使用的包管理器"
+        },
+        "moduleHelper.ext": {
+          "type": "string",
+          "default": "^js|jsx|ts|vue$",
+          "description": "匹配文件类型"
         }
+      }
     },
-    "capabilities": {
-        "completionProvider": {
-            "resolveProvider": "true",
-            "externalConsole": "true",
-            "triggerCharacters": [
-                "import "
-            ]
-        }
-    },
-    "scripts": {
-        "package": "vsce package",
-        "postinstall": "node ./node_modules/vscode/bin/install"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/kscript/npm-module-helper.git"
-    },
-    "bugs": {
-        "url": "https://github.com/kscript/npm-module-helper/issues"
-    },
-    "keywords": [
-        "npm",
-        "install",
-        "version",
-        "helper",
-        "tool"
+    "commands": [
+      {
+        "command": "moduleHelper.npmInstall",
+        "title": "安装项目依赖"
+      },
+      {
+        "command": "moduleHelper.queryModulesVersion",
+        "title": "查看依赖的安装版本"
+      },
+      {
+        "command": "moduleHelper.moduleInstall",
+        "title": "安装模块"
+      },
+      {
+        "command": "moduleHelper.moduleInstall2",
+        "title": "安装模块"
+      },
+      {
+        "command": "moduleHelper.moduleUpdate",
+        "title": "更新模块"
+      },
+      {
+        "when": "moduleHelper.mode !== 'yarn'",
+        "command": "moduleHelper.moduleRebuild",
+        "title": "重装模块"
+      },
+      {
+        "command": "moduleHelper.moduleUninstall",
+        "title": "卸载模块"
+      },
+      {
+        "command": "moduleHelper.moduleUninstall2",
+        "title": "卸载模块"
+      }
     ],
-    "devDependencies": {
-        "typescript": "^2.0.3",
-        "vscode": "^1.0.0",
-        "mocha": "^2.3.3",
-        "eslint": "^3.6.0",
-        "@types/node": "^6.0.40",
-        "@types/mocha": "^2.2.32"
+    "menus": {
+      "explorer/context": [
+        {
+          "when": "explorerResourceIsFolder",
+          "command": "moduleHelper.queryModulesVersion",
+          "group": "c_cxtmenu@1"
+        },
+        {
+          "when": "resourceFilename == 'package.json'",
+          "command": "moduleHelper.queryModulesVersion",
+          "group": "c_cxtmenu@1"
+        },
+        {
+          "when": "explorerResourceIsFolder",
+          "command": "moduleHelper.npmInstall",
+          "group": "c_cxtmenu@2"
+        },
+        {
+          "when": "resourceFilename == 'package.json'",
+          "command": "moduleHelper.npmInstall",
+          "group": "c_cxtmenu@2"
+        }
+      ],
+      "editor/context": [
+        {
+          "when": "editorTextFocus && resourceFilename == 'package.json'",
+          "command": "moduleHelper.moduleInstall",
+          "group": "c_cxtmenu@3"
+        },
+        {
+          "when": "editorTextFocus && resourceFilename == 'package.json'",
+          "command": "moduleHelper.moduleUpdate",
+          "group": "c_cxtmenu@4"
+        },
+        {
+          "when": "editorTextFocus && resourceFilename == 'package.json'",
+          "command": "moduleHelper.moduleRebuild",
+          "group": "c_cxtmenu@5"
+        },
+        {
+          "when": "editorTextFocus && resourceFilename == 'package.json'",
+          "command": "moduleHelper.moduleUninstall",
+          "group": "c_cxtmenu@6"
+        },
+        {
+          "when": "editorTextFocus && resourceFilename != 'package.json'",
+          "command": "moduleHelper.moduleInstall2",
+          "group": "c_cxtmenu@7"
+        },
+        {
+          "when": "editorTextFocus && resourceFilename != 'package.json'",
+          "command": "moduleHelper.moduleUninstall2",
+          "group": "c_cxtmenu@8"
+        }
+      ]
     }
+  },
+  "capabilities": {
+    "completionProvider": {
+      "resolveProvider": "true",
+      "externalConsole": "true",
+      "triggerCharacters": [
+        "import "
+      ]
+    }
+  },
+  "scripts": {
+    "compile": "tsc -watch -p ./",
+    "bundle": "rollup -c",
+    "package": "vsce package",
+    "postinstall": "node ./node_modules/vscode/bin/install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kscript/npm-module-helper.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kscript/npm-module-helper/issues"
+  },
+  "keywords": [
+    "npm",
+    "install",
+    "version",
+    "helper",
+    "tool"
+  ],
+  "devDependencies": {
+    "@types/mocha": "^5.2.6",
+    "@types/node": "^12.0.0",
+    "eslint": "^5.16.0",
+    "fs": "^0.0.1-security",
+    "mocha": "^2.3.3",
+    "path": "^0.12.7",
+    "rollup-plugin-typescript": "^1.0.1",
+    "typescript": "^3.4.5",
+    "vscode": "^1.0.0"
+  }
 }

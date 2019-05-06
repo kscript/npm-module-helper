@@ -1,4 +1,4 @@
-var command = require('./command')
+import command from './command'
 // 使用代理函数, 动态读取用户配置
 function proxy(){
   if (command && command.proxy) {
@@ -35,7 +35,7 @@ function activate(context) {
       proxy().npmInstall(context)
     }
   })
-  context.subscriptions = context.subscriptions.concat(disposables)
+  // context.subscriptions = context.subscriptions.concat(disposables)
 }
 
 // this method is called when your extension is deactivated
