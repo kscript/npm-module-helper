@@ -1,5 +1,5 @@
-import fs from 'fs'
-import path from 'path'
+import * as fs from 'fs'
+import * as path from 'path'
 
 export const readFile = (_path, func) => {
   fs.readFile(_path, 'utf8', func)

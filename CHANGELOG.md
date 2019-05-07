@@ -1,3 +1,6 @@
+## 0.2.4
+去除在package.json中操作模块的限制
+
 ## 0.2.3
 增加 TypeScript 支持, 增加 rollup.js 将 CommonJS 转换为 es6
 

@@ -1,29 +1,3 @@
-interface App {
-    commands: {
-        yarn: {
-            [propName: string]: string;
-        },
-        npm: {
-            [propName: string]: string;
-        },
-        cnpm: {
-            [propName: string]: string;
-        }
-    },
-    configuration: {
-        manager?: string;
-        ext?: string;
-        terminalTitle?: string;
-    },
-    types: {
-        [propName: string]: string;
-    },
-    defaults: {
-        manager: string;
-        ext: string;
-        terminalTitle: string;
-    }
-}
 export const app: App = {
     commands: {
         yarn: {
@@ -45,9 +19,15 @@ export const app: App = {
     types: {
         install2: 'install'
     },
+    texts: {
+        install: '安装',
+        uninstall: '卸载',
+        update: '更新',
+        rebuild: '重装'
+    },
     defaults: {
         manager: 'npm',
-        ext: '^js|jsx|ts|vue$',
+        ext: '^(js|jsx|ts|vue)$',
         terminalTitle: 'npm module helper'
     }
 }

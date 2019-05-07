@@ -1,7 +1,6 @@
-import path from 'path'
+import * as path from 'path'
 import { readFileSync, fsStat, createFile, writeFile } from './files'
-// var path = require('path')
-// var files = require('./files')
+
 export const queryModuleVersion = (deps, _dir) => {
   var info
   var file
@@ -66,18 +65,10 @@ export const isEmpty = (obj) => {
   }
   return true
 }
-export const extend = (source, target?: Object, cover?: boolean) => {
-  target = target || {}
-  for (var key in source) {
-    if (source.hasOwnProperty(key)) {
-      if (cover || !target.hasOwnProperty(key)) {
-        target[key] = source[key]
-      }
-    }
-  }
-  return target
-}
 
 export default {
-
+  queryModuleVersion,
+  extractModule,
+  outPackage,
+  isEmpty
 }

@@ -1,35 +1,44 @@
-import path from 'path'
-import vscode, { window } from 'vscode'
+/* /// <reference path="./command.d.ts" /> */
+
+import * as path from 'path'
+import * as vscode from 'vscode'
 import { extractModule, queryModuleVersion, isEmpty, outPackage } from './utils'
 import { currentPath, readFile, fsStat } from './files'
 import app from './app'
-
-let disposables = []
+import { Commands } from './types/command';
+const window = vscode.window
+let disposables: vscode.Disposable[] = []
 let terminalInstance = null
-let formatPackage = function (data) {
-  let packageJSON = {
-    dependencies: {},
-    devDependencies: {}
-  }
+
+/**
+ * 对package文件进行处理
+ * @func
+ * @param {string} data package.json文件内容
+ * @returns {object} 项目依赖信息 (不含peerDependencies)
+ */
+export const formatPackage = (data: string): Commands.packageJson => {
+  let result: Commands.packageJson
   try {
-    packageJSON = JSON.parse(data)
-    packageJSON.dependencies = packageJSON.dependencies || {}
-    packageJSON.devDependencies = packageJSON.devDependencies || {}
+    result = JSON.parse(data)
   } catch (e) {
-    packageJSON = {
-      dependencies: {},
-      devDependencies: {}
-    }
+    console.log(e)
   }
-  return packageJSON
+  let { dependencies = {}, devDependencies = {} } = result || {}
+  return {
+    dependencies,
+    devDependencies
+  }
 }
 
-let windowTerminal = function (window, name) {
-  return window.createTerminal(name || 'cmd')
-}
-
-let cdProjectPath = function (terminal, context) {
-  // TODO 后期需对项目目录进行判断
+/**
+ * 打开项目目录 (预留的方法)
+ * @func
+ * @param {object} terminal 终端
+ * @param {object} context vscode传递给插件的环境
+ * @returns {object} 终端
+ */
+export const cdProjectPath = (terminal: vscode.Terminal, context: Commands.Context): vscode.Terminal => {
+  // TODO 后期可能会对项目目录进行判断..
   let isProjectPath = false
 
   if (isProjectPath) {
@@ -38,44 +47,103 @@ let cdProjectPath = function (terminal, context) {
   } else {
     terminal.sendText("cd " + context.fsDir)
   }
+  return terminal
 }
 
-let handler = {
-  /**
-   * 
-   * @param {string} command 要执行的指令
-   * @param {string} modules 要安装的模块
-   * @param {string} mode 开发模式/生产模式
-   */
-  exec: function(command, modules?, mode?:string){
-    let manager = app.configuration.manager
-    let commands = app.commands[manager]
-    command = commands.hasOwnProperty(command) ? commands[command] : command
-    return [
-      manager,
-      command,
-      modules || '',
-      modules ? mode || '' : ''
-    ].slice(0, arguments.length + 1).join(' ')
-  },
+/**
+ * 合成指令语句
+ * @func
+ * @param {string} command 要执行的指令
+ * @param {string} modules 要安装的模块
+ * @param {string} mode 依赖类型
+ * @returns {string} 一条最终合成的指令语句
+ */
+export const Command = (command: string, modules?: string, mode?: string): string => {
+  let manager = app.configuration.manager
+  let commands = app.commands[manager]
+  command = commands.hasOwnProperty(command) ? commands[command] : command
+  return [
+    manager,
+    command,
+    modules || '',
+    modules ? mode || '' : ''
+  ].join(' ')
 }
 
-export const terminal = () =>  {
+/**
+ * 返回一个终端 (单例)
+ * @returns {string} 一条最终合成的指令语句
+ */
+export const terminal = (): vscode.Terminal => {
   if (terminalInstance) {
     return terminalInstance
   }
-  return terminalInstance = windowTerminal(window, app.configuration.terminalTitle)
+  return terminalInstance = window.createTerminal(app.configuration.terminalTitle)
 }
 
-export const updateConfiguration = () => {
+/**
+ * 更新配置信息
+ * @returns {string} 返回最新的配置信息
+ */
+export const updateConfiguration = (): App["configuration"] => {
   let configuration = vscode.workspace.getConfiguration('moduleHelper')
   return Object.assign(app.configuration, app.defaults, configuration)
 }
-export const proxy = () => {
+
+/**
+ * 用户触发命令时调用的一个代理方法
+ * @returns {string} 返回所有可以执行的方法
+ */
+export const proxy = (): functionObject => {
   updateConfiguration()
   return myCommands
 }
-export const npmInstall = (context) => {
+/**
+ * 注册命令
+ * @returns {array} 已注册的命令列表 
+ */
+export const registerCommand = (command: string, func?: Function): vscode.Disposable[] => {
+  return disposables = disposables.concat(
+    vscode.commands.registerCommand(command, function (context) {
+      try {
+        currentPath(context, function (err, context) {
+          func && func(context)
+        })
+      } catch (e) {
+        console.log(e)
+      }
+    })
+  )
+}
+/**
+ * 批量注册命令
+ * @param {object|array} 命令集
+ * @returns {array} 已注册的命令列表 
+ */
+export const registerCommands = (commands: functionObject | [[string, Function]]) => {
+  let result = []
+  if (commands instanceof Object) {
+    if (commands instanceof Array) {
+      for (let i = 0; i < commands.length; i++) {
+        result.push(registerCommand.apply(null, commands[i]))
+      }
+    } else {
+      for (let com in commands) {
+        if (commands.hasOwnProperty(com)) {
+          result.push(registerCommand(com, commands[com]))
+        }
+      }
+    }
+  }
+  return disposables = disposables.concat(result)
+}
+
+/**
+ * 安装项目依赖
+ * @param {object} context vscode传递给插件的环境
+ * @returns {void}
+ */
+export const npmInstall = (context: Commands.Context) => {
   let myTerminal = terminal()
   currentPath(context, function (err, context) {
     if (err) {
@@ -89,7 +157,7 @@ export const npmInstall = (context) => {
         } else {
           cdProjectPath(myTerminal, context)
           myTerminal.show()
-          myTerminal.sendText(handler.exec('i'))
+          myTerminal.sendText(Command('i'))
         }
       })
     } catch (e) {
@@ -98,40 +166,12 @@ export const npmInstall = (context) => {
   })
 }
 
-export const moduleHandlerByType2 = (context, info) =>  {
-  info = info || {}
-  let myTerminal = terminal()
-  let ext = (path.parse(context.path) || {ext: ''}).ext.slice(1)
-  let selected
-  if (ext && new RegExp(app.configuration.ext).test(ext)){
-    selected = extractModule(window)
-    if (selected) {
-      myTerminal.show()
-      myTerminal.sendText(handler.exec.apply(handler, [info.type, selected, '-D']))
-    } else {
-      info.select && window.showInformationMessage(info.select)
-    }
-  } else {
-    info.match && window.showInformationMessage(info.match)
-  }
-}
-export const moduleInstall2 = (context) => {
-  moduleHandlerByType2(context, {
-    type: 'install',
-    match: '"当前文件类型不匹配, 如需安装, 请先在设置中配置"',
-    select: "当前行找不到有效的模块"
-  })
-}
-
-export const moduleUninstall2 = (context) =>  {
-  moduleHandlerByType2(context, {
-    type: 'uninstall',
-    match: '"当前文件类型不匹配, 如需删除, 请先在设置中配置"',
-    select: "当前行找不到有效的模块"
-  })
-}
-
-export const queryPackageVersion = (context) =>  {
+/**
+ * 查询当前项目依赖的版本
+ * @param {object} context vscode传递给插件的环境
+ * @returns {void}
+ */
+export const queryPackageVersion = (context: Commands.Context) => {
   currentPath(context, function (err, context) {
     let fsDir = context.fsDir
     readFile(path.join(fsDir, 'package.json'), function (err, data) {
@@ -157,19 +197,12 @@ export const queryPackageVersion = (context) =>  {
     })
   })
 }
-export const moduleHandlerByType = (context, type, func?) =>  {
-  type = app.types[type] || type
-  let manager = app.configuration.manager
-  let len = manager === 'yarn' && type === 'update' ? 2 : 3
-  moduleHandler(context, function (hasModule, selected, terminal) {
-    // 如果回调不存在, 或返回true
-    if (!func || func(hasModule, selected, terminal)) {
-      hasModule[0] && terminal.sendText(handler.exec.apply(handler, [type, selected, '-S'].slice(0, len)))
-      hasModule[1] && terminal.sendText(handler.exec.apply(handler, [type, selected, '-D'].slice(0, len)))
-    }
-  })
-}
-export const moduleHandler = (context, func) =>  {
+/**
+ * 获取用户选择的模块
+ * @param context vscode传递给插件的环境
+ * @param func 获取成功时的回调
+ */
+export const selectedModule = (context: Commands.Context, func?: Function) => {
   let selected = extractModule(window)
   let myTerminal = terminal()
   selected && readFile(context.fsPath, function (err, data) {
@@ -191,74 +224,62 @@ export const moduleHandler = (context, func) =>  {
     }
   })
 }
-export const moduleUninstall = (context, type) =>  {
-  let selected = extractModule(window)
-  let myTerminal = terminal()
-  selected && fsStat(path.join(context.fsDir, 'node_modules', selected), function (error, stat) {
-    if (error) {
-      window.showInformationMessage("未找到 " + selected + " 模块, 卸载结束!")
-    } else {
-      readFile(context.fsPath, function (err, data) {
-        if (err) {
-          return
-        }
-        let packageJSON = formatPackage(data)
-        let hasModule = [packageJSON.dependencies[selected], packageJSON.devDependencies[selected]]
-        if (hasModule[0] || hasModule[1]) {
-          try {
-            cdProjectPath(myTerminal, context)
-            myTerminal.show()
-            hasModule[0] && myTerminal.sendText(handler.exec(type, selected, '-S'))
-            hasModule[1] && myTerminal.sendText(handler.exec(type, selected, '-D'))
-          } catch (e) {
-            console.log(e)
-          }
-        }
-      })
+
+/**
+ * 根据用户触发的命令来执行相应的指令
+ * @param {object} context vscode传递给插件的环境
+ * @param {string} type 用户触发的命令
+ * @param {function=} func 获取到用户选择的模块时的回调
+ * @returns {void}
+ */
+export const moduleHandlerByType = (context: Commands.Context, type: string, func?: Function) => {
+  type = app.types[type] || type
+  let manager = app.configuration.manager
+  let len = manager === 'yarn' && type === 'update' ? 2 : 3
+  selectedModule(context, (hasModule, selected, terminal) => {
+    // 如果回调不存在, 或返回true
+    if (!func || func(hasModule, selected, terminal)) {
+      hasModule[0] && terminal.sendText(Command.apply(null, [type, selected, '-S'].slice(0, len)))
+      hasModule[1] && terminal.sendText(Command.apply(null, [type, selected, '-D'].slice(0, len)))
     }
   })
 }
-export const registerCommand = (command, func) =>  {
-  return disposables = disposables.concat(
-    vscode.commands.registerCommand(command, function (context) {
-      try {
-        currentPath(context, function (err, context) {
-          func && func(context)
-        })
-      } catch (e) {
-        console.log(e)
-      }
-    })
-  )
-}
-export const registerCommands = (commands) =>  {
-  let result = []
-  if (commands instanceof Object) {
-    if (commands instanceof Array) {
-      for (let i = 0; i < commands.length; i++) {
-        result.push(registerCommand.apply(null, commands))
-      }
+
+/**
+ * 根据用户触发的命令来执行相应的指令 (不验证package.json)
+ * @param {object} context vscode传递给插件的环境
+ * @param {object} info 执行命令时用到的一些信息
+ * @returns {void}
+ */
+export const moduleHandlerByType2 = (context: Commands.Context, info: Commands.info) => {
+  info = Object.assign({
+    match: '文件类型不匹配, 当前命令已忽略, 如需执行' + app.texts[info.type]+ '命令, 请在设置中配置[匹配文件类型]',
+    select: '当前行找不到有效的模块'
+  }, info)
+  let myTerminal = terminal()
+  let ext = (path.parse(context.path) || { ext: '' }).ext.slice(1)
+  let selected
+  if (ext && new RegExp(app.configuration.ext).test(ext)) {
+    selected = extractModule(window)
+    if (selected) {
+      myTerminal.show()
+      myTerminal.sendText(Command(info.type, selected, '-D'))
     } else {
-      for (let com in commands) {
-        if (commands.hasOwnProperty(com)) {
-          result.push(registerCommand(com, commands[com]))
-        }
-      }
+      info.select && window.showInformationMessage(info.select)
     }
+  } else {
+    info.match && window.showInformationMessage(info.match)
   }
-  return disposables = disposables.concat(result)
 }
+
 export const myCommands = {
   proxy,
   npmInstall,
   updateConfiguration,
   moduleHandlerByType2,
-  moduleInstall2,
-  moduleUninstall2,
   queryPackageVersion,
   moduleHandlerByType,
-  moduleHandler,
-  moduleUninstall,
+  selectedModule,
   registerCommand,
   registerCommands,
   terminal

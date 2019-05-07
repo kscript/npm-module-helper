@@ -9,28 +9,32 @@ function proxy(){
 
 // 插件入口, 用于注册命令
 function activate(context) {
-  var disposables = command.registerCommands({
+  let disposables = command.registerCommands({
     'moduleHelper.queryModulesVersion': function (context) {
       proxy().queryPackageVersion(context)
     },
-    'moduleHelper.moduleUninstall': function (context) {
-      proxy().moduleUninstall(context, 'uninstall')
-    },
+
     'moduleHelper.moduleInstall': function (context) {
-      proxy().moduleHandlerByType(context, 'install')
+      proxy().moduleHandlerByType2(context, { type: 'install' })
     },
     'moduleHelper.moduleInstall2': function (context) {
-      proxy().moduleInstall2(context)
+      proxy().moduleHandlerByType2(context, { type: 'install' })
+    },
+
+    'moduleHelper.moduleUninstall': function (context) {
+      proxy().moduleHandlerByType2(context, { type: 'uninstall' })
     },
     'moduleHelper.moduleUninstall2': function (context) {
-      proxy().moduleUninstall2(context)
+      proxy().moduleHandlerByType2(context, { type: 'uninstall' })
     },
+
     'moduleHelper.moduleRebuild': function (context) {
-      proxy().moduleHandlerByType(context, 'rebuild')
+      proxy().moduleHandlerByType2(context, { type: 'rebuild' })
     },
     'moduleHelper.moduleUpdate': function (context) {
-      proxy().moduleHandlerByType(context, 'update')
+      proxy().moduleHandlerByType2(context, { type: 'update' })
     },
+
     'moduleHelper.npmInstall': function (context) {
       proxy().npmInstall(context)
     }
