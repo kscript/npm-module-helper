@@ -1,6 +1,6 @@
-import { ExtensionContext } from 'vscode'
+import * as vscode from 'vscode'
 
-declare namespace Commands {
+declare module Commands {
     export interface info {
         type: string;
         select?: string;
@@ -15,7 +15,6 @@ declare namespace Commands {
         fsDir: string;
         fsPath: string;
     }
-    export type Context = ExtensionContext & customContext;
-    export type test = string;
+    export type Context = vscode.ExtensionContext & customContext;
     export function formatPackage (data: string): packageJson
 }
