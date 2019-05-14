@@ -200,7 +200,14 @@ let terminalInstance = null;
  */
 const terminal = () => {
     if (terminalInstance) {
-        return terminalInstance;
+        try {
+            if ((window.terminals || []).filter((item) => item._id === terminalInstance._id).length) {
+                return terminalInstance;
+            }
+        }
+        catch (e) {
+            console.log(e);
+        }
     }
     return terminalInstance = window.createTerminal(app.configuration.terminalTitle);
 };
