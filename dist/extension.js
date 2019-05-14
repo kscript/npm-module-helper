@@ -249,23 +249,9 @@ const Command = (command, modules, mode) => {
  */
 const execCommand = (context, command) => {
     let myTerminal = terminal();
-    cdProjectPath(myTerminal, context);
     myTerminal.sendText(command);
     myTerminal.show();
     return myTerminal;
-};
-/**
- * 打开项目目录 (预留的方法)
- * @func
- * @param {object} terminal 终端
- * @param {object} context vscode传递给插件的环境
- * @returns {object} 终端
- */
-const cdProjectPath = (terminal, context) => {
-    {
-        terminal.sendText("cd " + context.fsDir);
-    }
-    return terminal;
 };
 /**
  * 对package文件进行处理

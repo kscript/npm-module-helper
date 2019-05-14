@@ -90,7 +90,7 @@ export const cdProjectPath = (terminal: vscode.Terminal, context: Commands.Conte
     // 如果是项目目录, 什么都不做
     // ...
   } else {
-    terminal.sendText("cd " + context.fsDir)
+    // terminal.sendText("cd " + context.fsDir)
   }
   return terminal
 }

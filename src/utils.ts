@@ -19,6 +19,7 @@ export const queryModuleVersion = (deps: stringObject, dir: string): stringObjec
   }
   return modules
 }
+
 /**
  * 抽出模块名
  * @param {object} deps 依赖信息
@@ -38,6 +39,7 @@ export const extractModule = (window): string => {
   }
   return ''
 }
+
 const writeInfo = (path, data, window) => {
   return writeFile(path, typeof data === 'string' ? data : JSON.stringify(data, null, 2))
     .then(() => {
