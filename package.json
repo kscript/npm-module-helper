@@ -2,7 +2,7 @@
   "name": "npm-module-helper",
   "displayName": "npm-module-helper",
   "description": "npm模块助手, 快速安装/卸载模块",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "publisher": "luren",
   "engines": {
     "vscode": "^1.12.0"
@@ -49,6 +49,20 @@
         }
       }
     },
+    "keybindings": [
+      {
+        "command": "moduleHelper.moduleUninstall2",
+        "key": "ctrl+F8",
+        "mac": "ctrl+F8",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "moduleHelper.moduleInstall2",
+        "key": "ctrl+F9",
+        "mac": "ctrl+F9",
+        "when": "editorTextFocus"
+      }
+    ],
     "commands": [
       {
         "command": "moduleHelper.npmInstall",
@@ -172,7 +186,7 @@
   ],
   "devDependencies": {
     "@types/mocha": "^5.2.6",
-    "@types/node": "^12.0.0",
+    "@types/node": "^12.7.4",
     "eslint": "^5.16.0",
     "fs": "^0.0.1-security",
     "mocha": "^2.3.3",

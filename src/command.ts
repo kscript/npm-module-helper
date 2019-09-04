@@ -16,7 +16,7 @@ let terminalInstance: vscode.Terminal = null
 export const terminal = (): vscode.Terminal => {
   if (terminalInstance) {
     try {
-      if ((window.terminals || []).filter((item) => item._id === terminalInstance._id).length) {
+      if ((window['terminals'] || []).filter((item) => item['_id'] === terminalInstance['_id']).length) {
         return terminalInstance
       }
     } catch (e) {
@@ -119,48 +119,6 @@ export const formatPackage = (data: string): Commands.packageJson => {
     dependencies,
     devDependencies
   }
-}
-
-/**
- * 注册vs命令
- * @returns {array} 已注册的命令列表 
- */
-export const registerCommand = (command: string, func?: Function): vscode.Disposable => {
-  return disposables[
-    disposables.push(
-      vscode.commands.registerCommand(command, (context: Commands.Context) => {
-        try {
-          currentPath(context, (err: Error, context: Commands.Context) =>  {
-            func && func(context)
-          })
-        } catch (e) {
-          console.log(e)
-        }
-      })
-    )
-  ]
-}
-
-/**
- * 批量注册vs命令
- * @param {object|array} 命令集
- * @returns {array} 已注册的命令列表 
- */
-export const registerCommands = (commands: functionObject | [[string, Function]]): vscode.Disposable[] => {
-  if (commands instanceof Object) {
-    if (commands instanceof Array) {
-      for (let i = 0; i < commands.length; i++) {
-        registerCommand.apply(null, commands[i])
-      }
-    } else {
-      for (let com in commands) {
-        if (commands.hasOwnProperty(com)) {
-          registerCommand(com, commands[com])
-        }
-      }
-    }
-  }
-  return disposables
 }
 
 /**
@@ -314,8 +272,6 @@ export const myCommands = {
   moduleHandlerByType,
   execCommand,
   selectedModule,
-  registerCommand,
-  registerCommands,
   terminal
 }
 export default myCommands

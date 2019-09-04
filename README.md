@@ -23,13 +23,16 @@
 ### 用户配置
 在用户设置中搜索 插件名 npm-module-helper 快速定位到插件配置~  
 
-- 版本 0.2.0 新增 匹配文件类型 设置  
-该配置是一个正则表达式的字符串, 默认值: '^(js|jsx|ts|vue)$'  
-当用户在打开的文件中, 选择了安装模块(右键菜单), 那么会根据用户设置的表达式, 检查此文件是否可以使用安装模块功能  
-请在 <font color="green">模块所在行</font> 右键选择安装, 插件会将 <font color="green">第一个被单/双引号包裹的文本</font> 作为模块名, 并将其安装在<font color="green">项目根目录(编辑器工作目录)</font>
+- 匹配文件类型 [RegExp]  
+激活插件的白名单 默认值: ^(js|jsx|ts|vue)$  
+<font color="green">按下快捷键</font> 或 <font color="green">右键选择安装</font> 时, 如果允许当前类型的文件激活插件, 插件会将 <font color="green">第一个被单/双引号包裹的文本</font> 作为模块名, 并将其安装在<font color="green">项目根目录(编辑器工作目录)</font>  
 
-- 版本 0.1.5 新增对包管理器的设置  
-支持选择 npm/cnpm/yarn , 默认值: "npm"  
+- 包管理器 [string]  
+支持选择 npm/cnpm/yarn, 默认值: 'npm'  
+
+## 快捷键  
+- 卸载: Ctrl + F8  
+- 安装: Ctrl + F9  
 
 ### LICENSE
 MIT

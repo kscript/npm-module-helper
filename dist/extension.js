@@ -192,7 +192,6 @@ const app = {
 };
 
 const window = vscode.window;
-let disposables = [];
 let terminalInstance = null;
 /**
  * 返回一个终端 (单例)
@@ -201,7 +200,7 @@ let terminalInstance = null;
 const terminal = () => {
     if (terminalInstance) {
         try {
-            if ((window.terminals || []).filter((item) => item._id === terminalInstance._id).length) {
+            if ((window['terminals'] || []).filter((item) => item['_id'] === terminalInstance['_id']).length) {
                 return terminalInstance;
             }
         }
@@ -279,44 +278,6 @@ const formatPackage = (data) => {
         dependencies,
         devDependencies
     };
-};
-/**
- * 注册vs命令
- * @returns {array} 已注册的命令列表
- */
-const registerCommand = (command, func) => {
-    return disposables[disposables.push(vscode.commands.registerCommand(command, (context) => {
-        try {
-            currentPath(context, (err, context) => {
-                func && func(context);
-            });
-        }
-        catch (e) {
-            console.log(e);
-        }
-    }))];
-};
-/**
- * 批量注册vs命令
- * @param {object|array} 命令集
- * @returns {array} 已注册的命令列表
- */
-const registerCommands = (commands) => {
-    if (commands instanceof Object) {
-        if (commands instanceof Array) {
-            for (let i = 0; i < commands.length; i++) {
-                registerCommand.apply(null, commands[i]);
-            }
-        }
-        else {
-            for (let com in commands) {
-                if (commands.hasOwnProperty(com)) {
-                    registerCommand(com, commands[com]);
-                }
-            }
-        }
-    }
-    return disposables;
 };
 /**
  * 安装项目依赖
@@ -468,11 +429,12 @@ const myCommands = {
     moduleHandlerByType,
     execCommand,
     selectedModule,
-    registerCommand,
-    registerCommands,
     terminal
 };
 
+const getContext = (context) => {
+    return context || (vscode.window.activeTextEditor ? Object.assign({}, vscode.window.activeTextEditor['_documentData']._uri) : context);
+};
 // 使用代理函数, 动态读取用户配置
 const proxy$1 = () => {
     if (myCommands && myCommands.proxy) {
@@ -482,33 +444,37 @@ const proxy$1 = () => {
 };
 // 插件入口, 用于注册命令
 exports.activate = (context) => {
-    let disposables = myCommands.registerCommands({
-        'moduleHelper.queryModulesVersion': (context) => {
-            proxy$1().queryPackageVersion(context);
+    let commands = {
+        'moduleHelper.queryModulesVersion': (command, context) => {
+            command.queryPackageVersion(context);
         },
-        'moduleHelper.moduleInstall': (context) => {
-            proxy$1().moduleHandlerByType2(context, { type: 'install' });
+        'moduleHelper.moduleInstall': (command, context) => {
+            command.moduleHandlerByType2(context, { type: 'install' });
         },
-        'moduleHelper.moduleInstall2': (context) => {
-            proxy$1().moduleHandlerByType2(context, { type: 'install' });
+        'moduleHelper.moduleInstall2': (command, context) => {
+            command.moduleHandlerByType2(context, { type: 'install' });
         },
-        'moduleHelper.moduleUninstall': (context) => {
-            proxy$1().moduleHandlerByType2(context, { type: 'uninstall' });
+        'moduleHelper.moduleUninstall': (command, context) => {
+            command.moduleHandlerByType2(context, { type: 'uninstall' });
         },
-        'moduleHelper.moduleUninstall2': (context) => {
-            proxy$1().moduleHandlerByType2(context, { type: 'uninstall' });
+        'moduleHelper.moduleUninstall2': (command, context) => {
+            command.moduleHandlerByType2(context, { type: 'uninstall' });
         },
-        'moduleHelper.moduleRebuild': (context) => {
-            proxy$1().moduleHandlerByType2(context, { type: 'rebuild' });
+        'moduleHelper.moduleRebuild': (command, context) => {
+            command.moduleHandlerByType2(context, { type: 'rebuild' });
         },
-        'moduleHelper.moduleUpdate': (context) => {
-            proxy$1().moduleHandlerByType2(context, { type: 'update' });
+        'moduleHelper.moduleUpdate': (command, context) => {
+            command.moduleHandlerByType2(context, { type: 'update' });
         },
-        'moduleHelper.npmInstall': (context) => {
-            proxy$1().npmInstall(context);
+        'moduleHelper.npmInstall': (command, context) => {
+            command.npmInstall(context);
         }
-    });
-    // context.subscriptions = context.subscriptions.concat(disposables)
+    };
+    for (let key in commands) {
+        vscode.commands.registerCommand(key, (context) => {
+            commands[key](proxy$1(), getContext(context));
+        });
+    }
 };
 // this method is called when your extension is deactivated
 exports.deactivate = () => { };
