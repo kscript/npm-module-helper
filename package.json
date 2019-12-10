@@ -2,7 +2,7 @@
   "name": "npm-module-helper",
   "displayName": "npm-module-helper",
   "description": "npm模块助手, 快速安装/卸载模块",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "publisher": "luren",
   "engines": {
     "vscode": "^1.12.0"
@@ -44,7 +44,7 @@
         },
         "moduleHelper.ext": {
           "type": "string",
-          "default": "^(js|jsx|ts|vue)$",
+          "default": "^(js|jsx|ts|tsx|vue)$",
           "description": "匹配文件类型"
         }
       }
